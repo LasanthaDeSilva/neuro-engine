@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Scientific visualization of neurodivergent cognitive bandwidth, Triple Network dynamics, Polyvagal arousal, and somatic load.">
+    <title>Scientific Multi-Profile Neuro Dynamics & Somatic Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #030712;
+            --panel-bg: rgba(17, 24, 39, 0.65);
+            --panel-border: rgba(31, 41, 61, 0.8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            
+            /* Functional Network Colors */
+            --ecn: #f43f5e;
+            --dmn: #a78bfa;
+            --smn: #34d399;
+            --vin: #fbbf24;
+            --sn: #ef4444;
+
+            /* Somatic Colors */
+            --somatic-breath: #38bdf8;
+            --somatic-vertigo: #f59e0b;
+            --somatic-drag: #8b5cf6;
+            --somatic-visceral: #ec4899;
+            --somatic-eff: #10b981;
+            --somatic-mask: #c084fc;
+            --somatic-debt: #f43f5e;
+            --somatic-spoons: #fcd34d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: #010206; 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+            padding: 4vh 0; 
+            box-sizing: border-box;
+        }
+
+        .app-container { 
+            display: flex; 
+            flex: 1; 
+            overflow: hidden; 
+            flex-direction: row; 
+            background: radial-gradient(circle at 50% 50%, #080c14 0%, #030712 100%); 
+            border-top: 1px solid var(--panel-border);
+            border-bottom: 1px solid var(--panel-border);
+        }
+        
+        .sidebar-left, .sidebar-right { 
+            background: var(--panel-bg); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 20px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 14px; 
+            flex-shrink: 0; 
+            z-index: 10;
+        }
+        
+        .sidebar-left { width: 380px; border-right: 1px solid var(--panel-border); }
+        .sidebar-right { width: 400px; border-left: 1px solid var(--panel-border); }
+        
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; transition: transform 0.1s ease; }
+        
+        @media (max-width: 1024px) {
+            .app-container { flex-direction: column; overflow-y: auto; border: none; }
+            .sidebar-left, .sidebar-right { width: 100%; border: none; border-bottom: 1px solid var(--panel-border); overflow-y: visible; flex-shrink: 0; backdrop-filter: none; background: #080c14; }
+            .main-content { height: 60vh; flex: none; }
+            body { height: auto; overflow: auto; padding: 2vh 0; }
+        }
+
+        canvas#canvas { flex: 1; width: 100%; height: 100%; cursor: crosshair; touch-action: none; outline: none; }
+        canvas#canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+
+        .info-panel { height: 210px; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(10px); border-top: 1px solid var(--panel-border); padding: 18px; overflow-y: auto; display: flex; gap: 20px; flex-shrink: 0; z-index: 10; }
+        @media (max-width: 1024px) { .info-panel { height: auto; flex-direction: column; } }
+        
+        .info-section { flex: 1; font-size: 0.85rem; }
+
+        h1 { font-size: 1.25rem; color: var(--accent); font-weight: 700; margin-bottom: 4px; letter-spacing: -0.5px; }
+        h2 { font-size: 0.85rem; color: var(--accent); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+        
+        select, input[type="range"] { 
+            width: 100%; padding: 8px 10px; background: rgba(0, 0, 0, 0.4); color: var(--text-main); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; outline: none; 
+            margin-bottom: 6px; font-size: 0.85rem; transition: all 0.2s; font-family: inherit;
+        }
+        select:hover, input[type="range"]:hover { border-color: rgba(255,255,255,0.25); }
+        select:focus, button:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+        
+        input[type="range"] { -webkit-appearance: none; height: 6px; background: #1f293d; padding: 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+        button { font-family: inherit; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        button.play-btn { width: 100%; padding: 12px; background: var(--accent); color: #030712; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; margin-top: 8px; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2); }
+        button.play-btn:hover { background: #7dd3fc; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3); }
+        button.play-btn:active { transform: translateY(1px); box-shadow: none; }
+        button.play-btn:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        .btn-intervention { flex: 1; min-width: 100px; padding: 8px; background: rgba(0,0,0,0.4); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500; }
+        .btn-intervention:hover { background: rgba(255,255,255,0.05); }
+
+        .visual-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,0.9); z-index: 10; }
+        .badge { display: inline-block; background: rgba(17, 24, 39, 0.9); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; margin-bottom: 6px; border: 1px solid; backdrop-filter: blur(4px); }
+
+        .brain-container { position: relative; width: 100%; height: 160px; margin: 4px 0; }
+        .brain-outline { position: absolute; top: 0; left: 10%; width: 80%; height: 100%; opacity: 0.3; background: radial-gradient(ellipse at center, transparent 40%, rgba(30, 41, 59, 0.8) 70%); border-radius: 40% 60% 60% 40% / 50% 50% 60% 50%; border: 2px dashed #475569; }
+        .region { position: absolute; border-radius: 50%; filter: blur(12px); opacity: 0.1; transition: opacity 0.5s ease, box-shadow 0.5s ease; mix-blend-mode: screen; }
+        
+        #frontal { top: 10%; left: 15%; width: 95px; height: 95px; background: var(--ecn); }
+        #temporal { top: 40%; left: 35%; width: 80px; height: 55px; background: var(--dmn); }
+        #parietal { top: 5%; left: 45%; width: 80px; height: 80px; background: var(--smn); }
+        #occipital { top: 30%; left: 65%; width: 70px; height: 70px; background: var(--vin); }
+        #amygdala { top: 55%; left: 45%; width: 32px; height: 32px; background: var(--sn); filter: blur(6px); }
+
+        .legend { font-size: 0.75rem; display: grid; grid-template-columns: 1fr; gap: 4px; margin-top: 8px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-weight: 500; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 6px currentColor; }
+
+        .somatic-note { background: rgba(56, 189, 248, 0.05); border-left: 3px solid var(--accent); padding: 10px 12px; font-size: 0.75rem; line-height: 1.4; color: #cbd5e1; border-radius: 0 6px 6px 0; margin-bottom: 12px; }
+        .somatic-box { background: rgba(0, 0, 0, 0.3); padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px; }
+        
+        .meter-group { display: flex; flex-direction: column; gap: 4px; }
+        .meter-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .meter-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
+        .meter-fill { height: 100%; width: 0%; transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 8px currentColor; }
+
+        .desc-box { background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); }
+        
+        .chart-container { height: 70px; width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; margin-top: 12px; position: relative; overflow: hidden; }
+        canvas#liveChart { width: 100%; height: 100%; }
+        hr { border: 0; height: 1px; background: var(--panel-border); margin: 12px 0; }
+        p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; line-height: 1.5; }
+        
+        .section-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; display: block; font-weight: 700; }
+
+        footer.app-footer { background: #030712; text-align: center; padding: 10px; font-size: 0.75rem; color: #475569; border-top: 1px solid var(--panel-border); flex-shrink: 0; font-weight: 500; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        @keyframes overloadGlitch {
+            0% { filter: contrast(1) hue-rotate(0deg); transform: translate(0, 0); }
+            20% { filter: contrast(1.15) hue-rotate(8deg); transform: translate(-2px, 2px); }
+            40% { filter: contrast(1.2) hue-rotate(-8deg); transform: translate(2px, -2px); }
+            60% { filter: contrast(1.1) hue-rotate(4deg); transform: translate(-2px, -2px); }
+            100% { filter: contrast(1) hue-rotate(0deg); transform: translate(0, 0); }
+        }
+        @keyframes heartbeatPulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.015); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.015); }
+            100% { transform: scale(1); }
+        }
+        
+        .meltdown-active { animation: overloadGlitch 0.4s infinite; border: 2px solid #ef4444 !important; box-sizing: border-box; }
+        .shutdown-active { filter: grayscale(0.85) contrast(0.9); border: 2px solid #3b82f6 !important; box-sizing: border-box; }
+        .burnout-active { filter: grayscale(0.95) contrast(0.8); border: 2px solid var(--somatic-debt) !important; box-sizing: border-box; }
+        .meltdown-pulse { animation: heartbeatPulse 0.8s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .meltdown-active, .meltdown-pulse { animation: none !important; filter: contrast(1.2) hue-rotate(8deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar-left" aria-label="Configuration Controls">
+            <header>
+                <h1>Neuro Dynamics Engine</h1>
+                <p style="font-size: 0.75rem;">Triple Network, Polyvagal Arousal & Allostatic Load</p>
+            </header>
+
+            <section style="margin-top: 10px;">
+                <span class="section-label">Simulation Presets</span>
+                <select id="presetSelector" style="margin-bottom: 0;">
+                    <option value="none">-- Select a Preset --</option>
+                    <option value="baseline">Baseline (Regulated NT)</option>
+                    <option value="adhd_office">ADHD (Overstimulated Office)</option>
+                    <option value="asd_social">ASD (Social Drain & Masking)</option>
+                    <option value="custom_01">Custom 01: 2e Deep Research Loop</option>
+                    <option value="asd_2e_burnout">2e Autistic (The Hidden Masking Crash)</option>
+                </select>
+            </section>
+            
+            <hr>
+            
+            <section>
+                <span class="section-label">Trait Profiles (Architecture)</span>
+                <label for="nt1">Primary Profile</label>
+                <select id="nt1"></select>
+                
+                <label for="nt2">Secondary Profile (Co-occurrence / 2e)</label>
+                <select id="nt2"><option value="none">None</option></select>
+                
+                <label for="nt3">Tertiary Profile (Co-occurrence / 2e)</label>
+                <select id="nt3"><option value="none">None</option></select>
+            </section>
+            
+            <hr>
+
+            <section>
+                <span class="section-label">State Variables (Load & Env)</span>
+                <label for="allostaticState" style="color: #fbbf24;">System Vulnerability <span>(Load)</span></label>
+                <select id="allostaticState">
+                    <option value="regulated">Regulated System (Rested)</option>
+                    <option value="medium_stress">Moderate Load (Medium Stress)</option>
+                    <option value="chronic_stress">Elevated Allostatic Load (Stress)</option>
+                </select>
+
+                <label for="chemicalMod" style="color: #10b981;">Chemical Modulators <span>(New)</span></label>
+                <select id="chemicalMod">
+                    <option value="none">Baseline (No active modulators)</option>
+                    <option value="caffeine">Caffeine / Weak Stimulant</option>
+                    <option value="stimulants">ADHD Medication (Amphetamines/MPH)</option>
+                    <option value="melatonin">Melatonin / Sedative</option>
+                </select>
+
+                <label for="personality">Social Energy</label>
+                <select id="personality">
+                    <option value="introvert">Introvert (High social drain)</option>
+                    <option value="extrovert">Extrovert (Requires social throughput)</option>
+                    <option value="ambivert">Ambivert (Contextual balance)</option>
+                </select>
+
+                <label for="monologue" style="color: #a78bfa;">Internal Processing Style</label>
+                <select id="monologue">
+                    <option value="verbal_structured">Structured Narrative (Anchors Focus)</option>
+                    <option value="visual_abstract">Abstract/Visual (Spatiotemporal)</option>
+                    <option value="racing">Racing/Looping (High cognitive friction)</option>
+                    <option value="absent">Direct Perception (Minimal filter)</option>
+                </select>
+                <label for="environment">Environmental Stimulation</label>
+                <select id="environment">
+                    <option value="normal">Neutral (Balanced Sensory Input)</option>
+                    <option value="quiet">Quiet Space (Low Acoustic Load)</option>
+                    <option value="office">Busy Environment (High Visual/Audio Noise)</option>
+                    <option value="social">Crowded Space (Intense Sensory/Social Demand)</option>
+                    <option value="networking_event">Networking Mixer (Open Floor)</option>
+                    <option value="sunlight">Intense Lighting (High Photonic Load)</option>
+                    <option value="pressure">High-Stakes Deadline (Acute Stress)</option>
+                </select>
+
+                <label for="taskMode">Task Engagement State</label>
+                <select id="taskMode">
+                    <option value="neutral">Routine Execution</option>
+                    <option value="casual_chitchat">Casual Office Chit-Chat</option>
+                    <option value="team_brainstorm">Unstructured Team Brainstorming</option>
+                    <option value="special_interest">Deep Engagement (Flow/Hyperfocus)</option>
+                    <option value="uninteresting">Low-Stimulation / Forced Repetition</option>
+                    <option value="research_loop">Intensive Information Synthesis</option>
+                    <option value="socializing">Socializing (Dynamic Interpersonal)</option>
+                </select>
+                
+                <div style="margin-top: 10px;">
+                    <label for="overloadThreshold">Simulation Overload Threshold: <span id="thresholdVal">26</span></label>
+                    <input type="range" id="overloadThreshold" min="15" max="40" value="26">
+                </div>
+            </section>
+
+            <hr>
+
+            <section>
+                <span class="section-label" style="color: #fbbf24;">Sudden Events (Perturbations)</span>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="btn-intervention" id="btn-distraction">⚡ Distraction</button>
+                    <button class="btn-intervention" id="btn-unexpected-change">⚠️ Unexpected Change</button>
+                </div>
+            </section>
+
+            <hr>
+            
+            <section>
+                <span class="section-label">Active Interventions (Recovery)</span>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="btn-intervention" id="btn-headphones" aria-pressed="false">🎧 Acoustic Shield</button>
+                    <button class="btn-intervention" id="btn-breathe" aria-pressed="false">🫁 Paced Breathe</button>
+                    <button class="btn-intervention" id="btn-dark" aria-pressed="false">🕶️ Reduce Light</button>
+                    <button class="btn-intervention" id="btn-brown-noise" aria-pressed="false" style="border-color:#d97706;">📻 Brown Noise</button>
+                </div>
+                
+                <span class="section-label" style="margin-top: 14px; color: #ef4444;">Crisis Recovery Steps</span>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="btn-intervention" id="btn-stimming" aria-pressed="false">🌀 Somatic Stim</button>
+                    <button class="btn-intervention" id="btn-deep-rest" aria-pressed="false">🛌 Deep Rest (Unmask)</button>
+                </div>
+            </section>
+
+            <button class="play-btn" id="playBtn" aria-label="Generate Procedural Audio">▶ Generate State Audio Profile</button>
+            <p id="audioStatus" style="font-size: 0.75rem; text-align: center; color: var(--accent); margin-top: 4px; font-weight: 500;" aria-live="polite"></p>
+        </aside>
+
+        <main class="main-content" id="main-content-area" aria-label="Visualization Area">
+            <div class="visual-overlay">
+                <h2>Cognitive Bandwidth & Particle Dynamics</h2>
+                <div id="visual-badges" aria-live="polite"></div>
+                <p style="font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-top: 4px;">Pointer = Target of Executive Focus</p>
+                <p id="shutdown-warning" style="display: none; font-weight: bold; margin-top: 6px; font-size: 0.85rem; letter-spacing: 0.5px;"></p>
+            </div>
+            
+            <canvas id="canvas" tabindex="0" aria-label="Interactive particle visualization representing cognitive load"></canvas>
+
+            <section class="info-panel" aria-label="Diagnostic Information">
+                <div class="info-section">
+                    <h2>Triple Network & Neurodynamic Mechanics</h2>
+                    <p id="desc-traits" style="color: #e2e8f0;"></p>
+                    <div id="desc-env" style="color: #93c5fd; font-size: 0.8rem; line-height: 1.5; margin-top: 6px;"></div>
+                </div>
+                <div class="info-section">
+                    <h2>Procedural Cognitive-State Audio</h2>
+                    <p id="desc-audio" style="color: #cbd5e1;"></p>
+                </div>
+            </section>
+        </main>
+
+        <aside class="sidebar-right" aria-label="Somatic and Brain Data">
+            <section>
+                <h2>Triple Network Functional Model</h2>
+                <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">*Model of large-scale functional neural networks.</p>
+                <div class="brain-container" aria-hidden="true">
+                    <div class="brain-outline"></div>
+                    <div id="frontal" class="region"></div>
+                    <div id="temporal" class="region"></div>
+                    <div id="parietal" class="region"></div>
+                    <div id="occipital" class="region"></div>
+                    <div id="amygdala" class="region"></div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item"><div class="dot" style="color: var(--ecn)"></div> ECN (Executive Control)</div>
+                    <div class="legend-item"><div class="dot" style="color: var(--dmn)"></div> DMN (Default Mode / Narrative)</div>
+                    <div class="legend-item"><div class="dot" style="color: var(--smn)"></div> SMN (Sensorimotor / Proprioceptive)</div>
+                    <div class="legend-item"><div class="dot" style="color: var(--vin)"></div> VIN (Visual Integration)</div>
+                    <div class="legend-item"><div class="dot" style="color: var(--sn)"></div> SN (Salience / Limbic Threat)</div>
+                </div>
+            </section>
+            <hr>
+
+            <section>
+                <h2>Autonomic & Somatic Telemetry</h2>
+                
+                <div class="somatic-box">
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span style="color: var(--somatic-spoons);">Daily Energy / Capacity (Spoons)</span>
+                            <span id="val-spoons" style="color: var(--somatic-spoons);">100%</span>
+                        </div>
+                        <div class="meter-bar-bg"><div id="bar-spoons" class="meter-fill" style="background: var(--somatic-spoons); box-shadow: 0 0 8px var(--somatic-spoons);"></div></div>
+                    </div>
+                    
+                    <div style="height: 1px; background: rgba(255,255,255,0.05); margin: 4px 0;"></div>
+
+                    <div class="meter-group">
+                        <div class="meter-label"><span>Cognitive Efficiency</span><span id="val-eff">0%</span></div>
+                        <div class="meter-bar-bg"><div id="bar-eff" class="meter-fill" style="background: var(--somatic-eff); color: var(--somatic-eff);"></div></div>
+                    </div>
+                    <div class="meter-group">
+                        <div class="meter-label"><span>Masking & Regulatory Effort</span><span id="val-mask">0%</span></div>
+                        <div class="meter-bar-bg"><div id="bar-mask" class="meter-fill" style="background: var(--somatic-mask); color: var(--somatic-mask);"></div></div>
+                    </div>
+                    <div class="meter-group" style="margin-top: 4px;">
+                        <div class="meter-label"><span>Modeled Breathing Strain</span><span id="val-breath">0%</span></div>
+                        <div class="meter-bar-bg"><div id="bar-breath" class="meter-fill" style="background: var(--somatic-breath); color: var(--somatic-breath);"></div></div>
+                    </div>
+                    <div class="meter-group">
+                        <div class="meter-label"><span>Executive Fatigue / Drag</span><span id="val-drag">0%</span></div>
+                        <div class="meter-bar-bg"><div id="bar-drag" class="meter-fill" style="background: var(--somatic-drag); color: var(--somatic-drag);"></div></div>
+                    </div>
+                    
+                    <div class="meter-group" style="margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                        <div class="meter-label">
+                            <span style="color: var(--somatic-debt);">Cumulative Masking Debt (Long-term)</span>
+                            <span id="val-debt" style="color: var(--somatic-debt);">0%</span>
+                        </div>
+                        <div class="meter-bar-bg"><div id="bar-debt" class="meter-fill" style="background: var(--somatic-debt); color: var(--somatic-debt);"></div></div>
+                        
+                        <div style="display: flex; gap: 6px; margin-top: 8px;">
+                            <button id="btn-reset-spoons" style="flex: 1; padding: 8px; background: rgba(31, 41, 61, 0.6); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-weight: 600;">🔄 Reset Spoons</button>
+                            <button id="btn-reset-debt" style="flex: 1; padding: 8px; background: rgba(31, 41, 61, 0.6); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-weight: 600;">🔄 Reset Debt</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container" aria-label="Live Telemetry Graph">
+                    <span style="position: absolute; top: 4px; left: 6px; font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; font-weight: 700;">System Load History</span>
+                    <canvas id="liveChart"></canvas>
+                </div>
+            </section>
+
+            <section>
+                <h2>Multidimensional Synergy (2e)</h2>
+                <div class="desc-box" id="desc-spectrum" aria-live="polite">
+                    Select profiles above to view interacting state/trait dynamics.
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <footer class="app-footer">
+        <strong>Disclaimer:</strong> Scientific systems model based on network neuroscience and polyvagal theory. For educational abstraction, not clinical diagnosis.
+    </footer>
+
+    <script>
+        const regionColors = { f: "#f43f5e", t: "#a78bfa", p: "#34d399", o: "#fbbf24", a: "#ef4444" };
+
+        const neurotypes = {
+            "neurotypical": { name: "1. Neurotypical", focus: 6, chaos: 1, sensory: 3, color: "#94a3b8", regions: {f: 0.5, t: 0.3, p: 0.3, o: 0.3, a: 0.1}, desc: "Standard executive control network baseline with balanced sensory gating." },
+            "asd": { name: "2. Autism Spectrum", focus: 9, chaos: 2, sensory: 9, color: "#38bdf8", regions: {f: 0.7, t: 0.8, p: 0.9, o: 0.8, a: 0.4}, desc: "Monotropic attentional focus, heightened local perceptual processing, reduced Habituation." },
+            "adhd": { name: "3. ADHD", focus: 2, chaos: 8, sensory: 6, color: "#f43f5e", regions: {f: 0.9, t: 0.5, p: 0.6, o: 0.5, a: 0.3}, desc: "Dopaminergic pathway variability, interest-based nervous system, high novelty seeking." },
+            "dyslexia": { name: "4. Dyslexia", focus: 5, chaos: 3, sensory: 4, color: "#fbbf24", regions: {f: 0.7, t: 0.3, p: 0.8, o: 0.6, a: 0.2}, desc: "Phonological loop processing differences offset by enhanced visual-spatial synthesis." },
+            "dyspraxia": { name: "5. Dyspraxia / DCD", focus: 4, chaos: 5, sensory: 6, color: "#a78bfa", regions: {f: 0.8, t: 0.4, p: 0.9, o: 0.4, a: 0.3}, desc: "Sensorimotor integration and motor planning differences causing elevated physical fatigue." },
+            "dyscalculia": { name: "6. Dyscalculia", focus: 5, chaos: 3, sensory: 4, color: "#facc15", regions: {f: 0.6, t: 0.5, p: 0.85, o: 0.5, a: 0.3}, desc: "Intraparietal sulcus difference; altered spatial-numerical magnitude representation." },
+            "dysgraphia": { name: "7. Dysgraphia", focus: 4, chaos: 4, sensory: 4, color: "#fb923c", regions: {f: 0.75, t: 0.6, p: 0.75, o: 0.4, a: 0.2}, desc: "Orthographic coding friction and fine-motor execution strain." },
+            "dld": { name: "8. Developmental Language Diff.", focus: 5, chaos: 4, sensory: 5, color: "#34d399", regions: {f: 0.6, t: 0.85, p: 0.5, o: 0.6, a: 0.3}, desc: "Temporal lobe structural differences in processing complex linguistic syntax." },
+            "tourette": { name: "9. Tourette Syndrome", focus: 4, chaos: 6, sensory: 7, color: "#2dd4bf", regions: {f: 0.9, t: 0.4, p: 0.8, o: 0.3, a: 0.5}, desc: "Cortico-striato-thalamo-cortical circuit differences generating premonitory sensory urges." },
+            "apd": { name: "10. Auditory Processing Diff.", focus: 3, chaos: 5, sensory: 8, color: "#818cf8", regions: {f: 0.5, t: 0.95, p: 0.5, o: 0.4, a: 0.4}, desc: "Auditory cortex timing differences; signal-to-noise decoding friction." },
+            "vpd": { name: "11. Visual Processing Diff.", focus: 4, chaos: 5, sensory: 8, color: "#c084fc", regions: {f: 0.5, t: 0.3, p: 0.6, o: 0.95, a: 0.4}, desc: "Dorsal/Ventral stream visual decoding differences and figure-ground isolation friction." },
+            "synesthesia": { name: "12. Synesthesia", focus: 6, chaos: 2, sensory: 8, color: "#e879f9", regions: {f: 0.5, t: 0.8, p: 0.8, o: 0.8, a: 0.2}, desc: "Enhanced structural hyper-connectivity causing concurrent cross-modal perceptual activation." },
+            "hyperlexia": { name: "13. Hyperlexia", focus: 8, chaos: 2, sensory: 5, color: "#38bdf8", regions: {f: 0.7, t: 0.85, p: 0.4, o: 0.75, a: 0.2}, desc: "Precocious visual-word form recognition with intensely focused pattern orientation." },
+            "prosopagnosia": { name: "14. Prosopagnosia", focus: 5, chaos: 2, sensory: 4, color: "#9ca3af", regions: {f: 0.5, t: 0.4, p: 0.4, o: 0.85, a: 0.2}, desc: "Fusiform face area processing differences leading to structural feature-decoding reliance." },
+            "ocd": { name: "15. OCD", focus: 9, chaos: 6, sensory: 6, color: "#ef4444", regions: {f: 0.95, t: 0.4, p: 0.5, o: 0.4, a: 0.85}, desc: "Orbitofrontal-striatal hyper-looping generating error signals and ritualized compensation." },
+            "idd": { name: "16. Intellectual Dev. Difference", focus: 4, chaos: 3, sensory: 5, color: "#a3e635", regions: {f: 0.4, t: 0.5, p: 0.5, o: 0.5, a: 0.3}, desc: "Differential cognitive processing pacing requiring structural scaffolding." },
+            "epilepsy": { name: "17. Epilepsy / Neurological", focus: 3, chaos: 6, sensory: 7, color: "#f472b6", regions: {f: 0.6, t: 0.7, p: 0.7, o: 0.6, a: 0.5}, desc: "Neural synchronization fluctuations impacting baseline cognitive bandwidth." },
+            "mental_health": { name: "18. Anxiety/Trauma Stress Model", focus: 2, chaos: 7, sensory: 8, color: "#9f1239", regions: {f: 0.35, t: 0.5, p: 0.6, o: 0.5, a: 0.95}, desc: "Salience Network hyper-reactivity elevating threat detection and sympathetic tone." },
+            "gifted": { name: "19. Gifted / High Ability", focus: 8, chaos: 4, sensory: 6, color: "#fcd34d", regions: {f: 0.95, t: 0.7, p: 0.6, o: 0.6, a: 0.35}, desc: "Rapid neural signal propagation speed coupled with sensory overexcitability." },
+            "hsp": { name: "20. Highly Sensitive Person (HSP)", focus: 7, chaos: 4, sensory: 9, color: "#14b8a6", regions: {f: 0.7, t: 0.9, p: 0.8, o: 0.7, a: 0.7}, desc: "Deep cognitive processing and elevated sensory/emotional reactivity. Highly attuned to environmental subtleties but vulnerable to rapid overstimulation." }
+        };
+
+        const selects = [document.getElementById('nt1'), document.getElementById('nt2'), document.getElementById('nt3')];
+        Object.entries(neurotypes).forEach(([key, val]) => {
+            selects.forEach(select => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = val.name;
+                select.appendChild(opt);
+            });
+        });
+        selects[1].value = "none"; selects[2].value = "none";
+
+        let targetState = { 
+            focus: 5, chaos: 1, sensory: 5, overloadType: 'none', loadMetric: 0,
+            somatic: { eff: 100, mask: 0, breath: 0, vertigo: 0, drag: 0, visceral: 0 },
+            regions: { f: 0, t: 0, p: 0, o: 0, a: 0 }
+        };
+
+        let currentState = JSON.parse(JSON.stringify(targetState));
+        currentState.colors = []; currentState.connectionDistSq = 0;
+
+        let currentMaskingDebt = 0;
+        let currentSpoons = 100;
+        let isBurnout = false;
+        let interventions = { headphones: false, breathe: false, dark: false, stimming: false, deep_rest: false, brown_noise: false };
+        let activePerturbation = null;
+        let perturbationTimer = null;
+
+        // Chart Data
+        let chartData = new Array(100).fill(0);
+        const liveChart = document.getElementById('liveChart');
+        const chartCtx = liveChart.getContext('2d');
+        liveChart.width = liveChart.parentElement.clientWidth; 
+        liveChart.height = liveChart.parentElement.clientHeight;
+        function saveStateToURL() {
+            try {
+                const params = new URLSearchParams();
+                const inputs = ['nt1', 'nt2', 'nt3', 'allostaticState', 'chemicalMod', 'personality', 'monologue', 'environment', 'taskMode', 'overloadThreshold'];
+                inputs.forEach(id => params.set(id, document.getElementById(id).value));
+                ['headphones', 'breathe', 'dark', 'stimming', 'deep_rest', 'brown_noise'].forEach(key => params.set(key, interventions[key]));
+                window.history.replaceState({}, '', `${location.pathname}?${params}`);
+            } catch(e) {
+                console.warn("URL state save skipped to prevent UI freeze", e);
+            }
+        }
+
+        function loadStateFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (!params.toString()) return; 
+            const inputs = ['nt1', 'nt2', 'nt3', 'allostaticState', 'chemicalMod', 'personality', 'monologue', 'environment', 'taskMode', 'overloadThreshold'];
+            inputs.forEach(id => { if (params.has(id)) { let el = document.getElementById(id); if(el) el.value = params.get(id); } });
+            ['headphones', 'breathe', 'dark', 'stimming', 'deep_rest', 'brown_noise'].forEach(key => {
+                if (params.get(key) === 'true') setIntervention(key, true);
+            });
+        }
+
+        function setIntervention(key, active) {
+            if (interventions[key] !== active) {
+                const btnId = `btn-${key.replace('_', '-')}`;
+                const activeColor = key === 'headphones' ? 'rgba(52, 211, 153, 0.2)' : key === 'breathe' ? 'rgba(56, 189, 248, 0.2)' : key === 'dark' ? 'rgba(251, 191, 36, 0.2)' : key === 'brown_noise' ? 'rgba(217, 119, 6, 0.3)' : key === 'stimming' ? 'rgba(192, 132, 252, 0.2)' : 'rgba(59, 130, 246, 0.3)';
+                const borderColor = key === 'headphones' ? '#34d399' : key === 'breathe' ? '#38bdf8' : key === 'dark' ? '#fbbf24' : key === 'brown_noise' ? '#d97706' : key === 'stimming' ? '#c084fc' : '#3b82f6';
+                const btn = document.getElementById(btnId);
+                interventions[key] = active;
+                btn.style.background = active ? activeColor : 'rgba(0,0,0,0.4)';
+                btn.style.borderColor = active ? borderColor : 'rgba(255,255,255,0.1)';
+                btn.style.color = active ? '#fff' : 'var(--text-muted)';
+                btn.setAttribute('aria-pressed', active);
+                if(key === 'brown_noise') toggleBrownNoiseAudio(active);
+            }
+        }
+
+        // Dropdown Preset Loader
+        document.getElementById('presetSelector').addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (val === 'none') return;
+            
+            ['headphones', 'breathe', 'dark', 'stimming', 'deep_rest', 'brown_noise'].forEach(k => setIntervention(k, false));
+
+            if (val === 'baseline') {
+                document.getElementById('nt1').value = 'neurotypical';
+                document.getElementById('nt2').value = 'none';
+                document.getElementById('nt3').value = 'none';
+                document.getElementById('allostaticState').value = 'regulated';
+                document.getElementById('chemicalMod').value = 'none';
+                document.getElementById('personality').value = 'ambivert';
+                document.getElementById('monologue').value = 'verbal_structured';
+                document.getElementById('environment').value = 'normal';
+                document.getElementById('taskMode').value = 'neutral';
+                document.getElementById('overloadThreshold').value = 26;
+            } else if (val === 'adhd_office') {
+                document.getElementById('nt1').value = 'adhd';
+                document.getElementById('nt2').value = 'none';
+                document.getElementById('nt3').value = 'none';
+                document.getElementById('allostaticState').value = 'medium_stress';
+                document.getElementById('chemicalMod').value = 'caffeine';
+                document.getElementById('personality').value = 'extrovert';
+                document.getElementById('monologue').value = 'racing';
+                document.getElementById('environment').value = 'office';
+                document.getElementById('taskMode').value = 'uninteresting';
+                document.getElementById('overloadThreshold').value = 24;
+            } else if (val === 'asd_social') {
+                document.getElementById('nt1').value = 'asd';
+                document.getElementById('nt2').value = 'none';
+                document.getElementById('nt3').value = 'none';
+                document.getElementById('allostaticState').value = 'chronic_stress';
+                document.getElementById('chemicalMod').value = 'none';
+                document.getElementById('personality').value = 'introvert';
+                document.getElementById('monologue').value = 'visual_abstract';
+                document.getElementById('environment').value = 'social';
+                document.getElementById('taskMode').value = 'casual_chitchat';
+                document.getElementById('overloadThreshold').value = 22;
+            } else if (val === 'custom_01') {
+                document.getElementById('nt1').value = 'asd';
+                document.getElementById('nt2').value = 'gifted';
+                document.getElementById('nt3').value = 'none'; //
+                document.getElementById('allostaticState').value = 'chronic_stress';
+                document.getElementById('chemicalMod').value = 'none';
+                document.getElementById('personality').value = 'introvert';
+                document.getElementById('monologue').value = 'racing';
+                document.getElementById('environment').value = 'quiet';
+                document.getElementById('taskMode').value = 'research_loop';
+                document.getElementById('overloadThreshold').value = 34; // 
+            } else if (val === 'asd_2e_burnout') {
+                document.getElementById('nt1').value = 'asd';
+                document.getElementById('nt2').value = 'gifted';
+                document.getElementById('nt3').value = 'none';
+                document.getElementById('allostaticState').value = 'chronic_stress';
+                document.getElementById('chemicalMod').value = 'none';
+                document.getElementById('personality').value = 'introvert';
+                document.getElementById('monologue').value = 'verbal_structured';
+                document.getElementById('environment').value = 'office';
+                document.getElementById('taskMode').value = 'casual_chitchat';
+                document.getElementById('overloadThreshold').value = 30; // 2e push past normal thresholds
+            }
+            
+            document.getElementById('thresholdVal').textContent = document.getElementById('overloadThreshold').value;
+            currentSpoons = 100;
+            currentMaskingDebt = 0;
+            isBurnout = false;
+            recalculateTargetState();
+            
+            e.target.value = 'none';
+        });
+
+        function recalculateTargetState(skipURLSave = false) {
+            const keys = selects.map(s => s.value).filter(k => k !== 'none');
+            const selected = [...new Set(keys)].map(k => neurotypes[k]);
+            
+            let isPureNT = keys.length === 1 && keys[0] === 'neurotypical';
+            let isND = keys.some(k => k !== 'neurotypical' && k !== 'none');
+            let is2e = keys.includes('asd') && keys.includes('gifted'); // 2E Accurate Reality Tracker
+
+            const alloState = document.getElementById('allostaticState').value;
+            const chemMod = document.getElementById('chemicalMod').value;
+            const pers = document.getElementById('personality').value;
+            const monologue = document.getElementById('monologue').value;
+            const env = document.getElementById('environment').value;
+            const task = document.getElementById('taskMode').value;
+            const threshold = parseInt(document.getElementById('overloadThreshold').value, 10);
+            
+            document.getElementById('thresholdVal').textContent = threshold;
+
+            let baseFocus = selected.reduce((s, n) => s + n.focus, 0) / selected.length || 5;
+            let baseChaos = selected.reduce((s, n) => s + n.chaos, 0) / selected.length || 1;
+            let baseSensory = selected.reduce((s, n) => s + n.sensory, 0) / selected.length || 3;
+            
+            let reg = { f: 0, t: 0, p: 0, o: 0, a: 0 };
+            selected.forEach(n => {
+                reg.f = Math.max(reg.f, n.regions.f); reg.t = Math.max(reg.t, n.regions.t);
+                reg.p = Math.max(reg.p, n.regions.p); reg.o = Math.max(reg.o, n.regions.o);
+                reg.a = Math.max(reg.a, n.regions.a);
+            });
+
+            if (keys.includes('asd') && keys.includes('adhd')) baseChaos += 2;
+            
+            let envDescHtml = [];
+            const addDesc = (text, color="#cbd5e1") => { envDescHtml.push(`<span style="color:${color}; display:block; margin-bottom:4px;">${text}</span>`); };
+
+            if (chemMod === 'caffeine') { baseFocus += 1; baseChaos += 1; reg.a += 0.1; addDesc("☕ Caffeine Active: Increased focus but slightly elevated chaos/jitter.", "#a7f3d0"); }
+            else if (chemMod === 'stimulants') { baseFocus += 3; baseChaos = Math.max(0, baseChaos - 2.5); reg.f += 0.2; addDesc("💊 Stimulants Active: Dopamine floor raised, ECN strengthened, chaos suppressed.", "#34d399"); }
+            else if (chemMod === 'melatonin') { baseChaos = Math.max(0, baseChaos - 2); baseSensory = Math.max(0, baseSensory - 2); reg.a -= 0.2; addDesc("🌙 Melatonin Active: System slowing down, reduced sensory & chaos gating.", "#c084fc"); }
+
+            if (monologue === 'verbal_structured') { reg.f += 0.2; reg.t += 0.1; baseFocus += 1; addDesc("Verbal Processing: Narrative anchors ECN control."); }
+            else if (monologue === 'visual_abstract') { reg.p += 0.25; reg.o += 0.2; addDesc("Visual/Spatial Processing: Engaging SMN/VIN pathways."); }
+            else if (monologue === 'racing') { baseChaos += 2.5; baseFocus -= 1; reg.a += 0.2; reg.t += 0.3; addDesc("Racing Thoughts: DMN hyper-activity increases cognitive noise.", "#fca5a5"); }
+            else if (monologue === 'absent') { reg.t = Math.max(0.1, reg.t - 0.2); addDesc("Direct Perception: Minimal DMN narrative filtering, high sensory immediacy."); }
+
+            if (pers === 'introvert' && (env === 'social' || env === 'office' || env === 'networking_event')) { reg.a += 0.25; baseChaos += 1.5; addDesc("Introvert Drain: High social-signal decoding demand."); }
+            else if (pers === 'extrovert' && env === 'quiet') { baseChaos += 1.5; baseFocus -= 1; addDesc("Extrovert Friction: Under-arousal seeking stimulation."); }
+
+            const modifiers = {
+                'normal': () => addDesc("Neutral Environment: Balanced external input."),
+                'quiet': () => { baseChaos -= 1; baseFocus += 1; reg.a -= 0.15; addDesc("Quiet Space: Reduced auditory gating demand."); },
+                'office': () => { baseChaos += 2; baseFocus -= 1.5; reg.t += 0.35; addDesc("Busy Office: Salience network tracking movement/noise."); },
+                'social': () => { baseChaos += 3.5; baseFocus -= 2; reg.a += 0.25; addDesc("Crowded Space: Intense sensory & social decoding demand."); },
+                'networking_event': () => { 
+                    if (isPureNT) {
+                        baseChaos += 0.5; baseFocus += 1; 
+                        addDesc("Networking Mixer: NT system gains social momentum and positive arousal.", "#34d399");
+                    } else {
+                        baseSensory += 4; baseChaos += 4; reg.a += 0.4; 
+                        addDesc("Networking Mixer: Unpredictable social/sensory soup. Massive masking demand.", "#f87171");
+                    }
+                },
+                'sunlight': () => { baseSensory += 3; reg.o += 0.5; addDesc("Intense Light: Elevated photonic input to Visual Network.", "#fcd34d"); },
+                'pressure': () => { 
+                    reg.a += 0.45; reg.f += 0.35; 
+                    if (keys.includes('adhd') || keys.includes('gifted')) { baseFocus += 2.5; addDesc("Acute Pressure: Catecholamine spike enabling intense focus (ADHD/Gifted advantage).", "#60a5fa"); }
+                    else { baseFocus -= 2; baseChaos += 2; addDesc("Acute Pressure: Salience network threat override, ECN fracture.", "#f87171"); }
+                }
+            };
+            modifiers[env]();
+            if (task === 'special_interest') {
+                baseFocus = 9.5; baseChaos = Math.max(0, baseChaos - 3); reg.a = Math.max(0.1, reg.a - 0.3);
+                addDesc("🎯 Special Interest: Intrinsic dopaminergic flow suppresses friction.", "#38bdf8");
+            } else if (task === 'uninteresting') {
+                baseFocus = Math.max(1, baseFocus - 4); baseChaos += 3;
+                addDesc("🧱 Under-Stimulating Task: Heavy dopaminergic drag and ECN fatigue.", "#ef4444");
+            } else if (task === 'research_loop') {
+                baseFocus = Math.min(10, baseFocus + 1.5); reg.t += 0.25; reg.f += 0.2;
+                addDesc("🔍 Information Synthesis: High working memory load & cross-network synthesis.", "#38bdf8");
+            } else if (task === 'socializing') {
+                baseChaos += 2; reg.a += 0.2;
+                addDesc("💬 Socializing: Active interpersonal decoding and dynamic interaction.", "#a78bfa");
+            } else if (task === 'casual_chitchat') {
+                if (isPureNT) {
+                    baseChaos += 0.5;
+                    addDesc("☕ Casual Chit-Chat: Baseline social regulation. Minimal cognitive cost for NT system.", "#94a3b8");
+                } else {
+                    baseChaos += 2.5; reg.t += 0.4; reg.a += 0.25; 
+                    addDesc("🎭 Casual Chit-Chat: High-friction social script decoding and heavy masking demand.", "#fca5a5");
+                }
+            } else if (task === 'team_brainstorm') {
+                if (isPureNT) {
+                    baseFocus += 2; 
+                    addDesc("💡 Unstructured Brainstorming: NT system thrives on dynamic social ideation.", "#38bdf8");
+                } else if (keys.includes('adhd')) {
+                    baseFocus += 3; baseChaos += 1;
+                    addDesc("💡 Unstructured Brainstorming: ADHD novelty-seeking thrives here.", "#fbbf24");
+                } else {
+                    baseChaos += 3; baseFocus -= 1; reg.a += 0.3;
+                    addDesc("🌪️ Unstructured Brainstorming: Multi-speaker overlap causes auditory/executive traffic jams.", "#f87171");
+                }
+            }
+
+            // --- Sudden Event Overrides (Perturbations) ---
+            if (activePerturbation === 'distraction') {
+                if (keys.includes('adhd')) {
+                    baseChaos += 3.5; baseFocus -= 4.5; addDesc("⚡ Distraction: Severe train-of-thought derailment (ADHD).", "#fbbf24");
+                } else if (keys.includes('asd') || keys.includes('hsp')) {
+                    baseChaos += 2.5; baseSensory += 2.5; baseFocus -= 2; addDesc("⚡ Distraction: Sensory/cognitive flow forcefully broken.", "#fbbf24");
+                } else {
+                    baseChaos += 1.5; baseFocus -= 1.5; addDesc("⚡ Distraction: Brief attentional shift.", "#fbbf24");
+                }
+                reg.a += 0.15;
+            } else if (activePerturbation === 'unexpected_change') {
+                if (keys.includes('asd') || keys.includes('hsp') || keys.includes('ocd')) {
+                    baseChaos += 4.5; baseFocus -= 3.5; reg.a += 0.55; addDesc("⚠️ Unexpected Change: Heavy executive fracture & amygdala spike. High regulatory cost.", "#ef4444");
+                } else if (keys.includes('adhd')) {
+                    baseChaos += 2.5; baseFocus += (isBurnout ? -2 : 1); reg.a += 0.25; addDesc("⚠️ Unexpected Change: Dopaminergic pivot. Disruptive but potentially novel.", "#fbbf24");
+                } else {
+                    baseChaos += 2; reg.a += 0.2; addDesc("⚠️ Unexpected Change: Mild adaptive friction.", "#fbbf24");
+                }
+            }
+
+            if (interventions.headphones) { baseSensory -= 3.5; baseChaos -= 1.5; addDesc("🎧 Acoustic Shielding: Gating load on auditory cortex reduced.", "#34d399"); }
+            if (interventions.breathe) { reg.a -= 0.4; baseFocus += 1.5; addDesc("🫁 Paced Breathing: Stimulating vagal tone, lowering sympathetic arousal.", "#38bdf8"); }
+            if (interventions.dark) { baseSensory -= 2.5; reg.o -= 0.4; addDesc("🕶️ Light/Temp Reduced: Visual/thermoregulatory demand eased.", "#fbbf24"); }
+            if (interventions.brown_noise) { baseChaos -= 2; baseSensory -= 1; addDesc("📻 Brown Noise Active: Masking high-frequency environmental triggers, lowering chaos.", "#d97706"); }
+            if (interventions.stimming) { baseChaos = Math.max(0, baseChaos - 3); reg.p += 0.5; reg.a = Math.max(0.1, reg.a - 0.4); addDesc("🌀 Somatic Stimming: Proprioceptive loop burns off sympathetic arousal.", "#c084fc"); }
+            if (interventions.deep_rest) { baseSensory = Math.max(0, baseSensory - 6); baseChaos = Math.max(0, baseChaos - 5); reg.f = Math.max(0.1, reg.f - 0.5); addDesc("🛌 Deep Rest / Unmasking: System offline. Spoons recharging, load dropping.", "#3b82f6"); }
+
+            baseFocus = Math.max(0, Math.min(10, baseFocus));
+            baseChaos = Math.max(0, Math.min(10, baseChaos));
+            baseSensory = Math.max(0, Math.min(10, baseSensory));
+            Object.keys(reg).forEach(k => reg[k] = Math.max(0.1, Math.min(1, reg[k])));
+
+            let backgroundLoad = alloState === 'chronic_stress' ? 25 : (alloState === 'medium_stress' ? 12 : 0);
+            let activeSensoryFriction = Math.max(0, baseSensory - 5.0);
+            let activeAmygdalaFriction = Math.max(0, reg.a - 0.3);
+
+            let limbicRespiratoryDrive = activeAmygdalaFriction * 50; 
+            let sensoryBreathFriction = activeSensoryFriction * 4.5; 
+            
+            let neurotypeBreathModifier = 0;
+            if (keys.includes('mental_health')) {
+                neurotypeBreathModifier += 14 + (activeAmygdalaFriction * 18);
+            }
+            if (keys.includes('asd')) {
+                let socialMaskingContext = (env === 'social' || env === 'office' || env === 'networking_event' || task === 'casual_chitchat' || task === 'socializing');
+                neurotypeBreathModifier += 10 + (socialMaskingContext ? 8 : 0);
+            }
+            if (keys.includes('adhd')) {
+                neurotypeBreathModifier += 6 + (baseChaos * 0.9);
+            }
+            if (keys.includes('dyspraxia')) {
+                neurotypeBreathModifier += 8;
+            }
+            if (keys.includes('tourette')) {
+                neurotypeBreathModifier += 10;
+            }
+            if (keys.includes('hsp')) {
+                neurotypeBreathModifier += 7;
+            }
+            if (keys.includes('apd') || keys.includes('vpd')) {
+                neurotypeBreathModifier += 5;
+            }
+            if (isPureNT) {
+                neurotypeBreathModifier -= 8;
+            }
+
+            let contextBreathLoad = 0;
+            if (env === 'pressure') contextBreathLoad += 18;
+            if (env === 'social' || env === 'networking_event' || env === 'office') contextBreathLoad += 6;
+            if (task === 'uninteresting') contextBreathLoad += 6; 
+            if (task === 'special_interest') contextBreathLoad -= 12;
+
+            let chemBreathMod = 0;
+            if (chemMod === 'stimulants') chemBreathMod += 12; 
+            if (chemMod === 'caffeine') chemBreathMod += 6;   
+            if (chemMod === 'melatonin') chemBreathMod += 4;  
+
+            let dorsalFreezeBreathStrain = 0;
+            if (alloState === 'chronic_stress' && reg.a > 0.45) {
+                dorsalFreezeBreathStrain += 14;
+            }
+
+            let rawBreathStrain = backgroundLoad + limbicRespiratoryDrive + sensoryBreathFriction + 
+                                  neurotypeBreathModifier + contextBreathLoad + chemBreathMod + dorsalFreezeBreathStrain;
+
+            if (interventions.breathe) {
+                rawBreathStrain *= 0.35;
+                rawBreathStrain -= 15;
+            }
+            if (interventions.headphones) rawBreathStrain -= 5;
+            if (interventions.stimming) rawBreathStrain -= 7;
+
+            let breathStrain = Math.min(100, Math.max(0, rawBreathStrain));
+
+            let vertigoIndex = (backgroundLoad * 0.8) + (activeAmygdalaFriction * 35) + (activeSensoryFriction * 8) + (env === 'sunlight' ? 30 : 0) - (interventions.dark ? 20 : 0);
+            let dragIndex = (backgroundLoad * 0.9) + (task === 'uninteresting' ? 50 : 0) + (baseChaos > 5 ? (baseChaos - 5) * 8 : 0) - (chemMod === 'caffeine' ? 15 : 0) + (chemMod === 'melatonin' ? 40 : 0);
+            let visceralIndex = backgroundLoad + (activeAmygdalaFriction * 75) + (env === 'pressure' ? 20 : 0) - (interventions.breathe ? 20 : 0) + (chemMod === 'caffeine' ? 20 : 0);
+            let optimalArousal = 5.5;
+            let currentArousal = (baseChaos * 0.4) + (baseSensory * 0.4) + (reg.a * 3);
+            let arousalDistance = Math.abs(currentArousal - optimalArousal);
+            
+            let currentLoadMetric = baseChaos + baseSensory + (reg.a * 10) + (breathStrain / 10);
+            targetState.loadMetric = currentLoadMetric;
+
+            let efficiency = 100 - (arousalDistance * 12) - (dragIndex * 0.3) + (baseFocus * 2.5) - (activeAmygdalaFriction * 15);
+            if (task === 'special_interest') efficiency += 20;
+            if (isPureNT && (task === 'team_brainstorm' || env === 'networking_event')) efficiency += 10;
+            
+            // --- 2E ACCURATE REALITY INJECTION ---
+            if (is2e && currentLoadMetric <= threshold && !isBurnout) {
+                // 2e individuals intellectualize the world. They use raw cognitive power to brute-force 
+                // efficiency, masking the massive internal friction until they hit the crash threshold.
+                efficiency += 25; 
+                addDesc("🧠 2e Compensation: Raw cognitive horsepower artificially propping up efficiency.", "#fcd34d");
+            }
+
+            let internalFrictionSum = baseChaos + activeSensoryFriction + (activeAmygdalaFriction * 5);
+            let maskingEffort = (internalFrictionSum * 6) + (alloState === 'chronic_stress' ? 20 : (alloState === 'medium_stress' ? 10 : 0)) - (task === 'special_interest' ? 25 : 0);
+            
+            if (isPureNT) {
+                maskingEffort = (maskingEffort * 0.25) + (env === 'networking_event' || task === 'socializing' || env === 'social' ? 15 : 0);
+            } else if (is2e) {
+                // --- 2E DOUBLE MASKING DEBT ---
+                if (env === 'social' || env === 'office' || env === 'networking_event' || task === 'casual_chitchat' || task === 'socializing') {
+                    maskingEffort *= 2.2; // Massive multiplier. The "Double Mask" of hiding autism AND dumbing down giftedness.
+                    addDesc("🎭 2e Double Mask: Exhausting manual computation of social cues. Massive debt accumulation.", "#f43f5e");
+                } else {
+                    maskingEffort *= 1.5;
+                }
+            } else {
+                if (keys.includes('asd') || keys.includes('adhd') || keys.includes('hsp')) {
+                    if (env === 'social' || env === 'office' || env === 'networking_event' || task === 'casual_chitchat' || task === 'socializing') {
+                        maskingEffort *= 1.4;
+                    }
+                }
+            }
+            maskingEffort = Math.min(100, Math.max(0, maskingEffort));
+            
+            let overloadType = 'none';
+            if (isBurnout) {
+                overloadType = 'burnout';
+                addDesc("💥 SYSTEM FAILURE / BURNOUT: Daily energy depleted.", "var(--somatic-debt)");
+                efficiency *= 0.05; dragIndex = 100;
+            } else if (currentLoadMetric > threshold) {
+                if (reg.a > 0.65 || env === 'pressure' || baseChaos > 6.5) {
+                    overloadType = 'meltdown';
+                    addDesc("🚨 SYMPATHETIC MELTDOWN: High-arousal overload threshold breached.", "#ef4444");
+                } else {
+                    overloadType = 'shutdown';
+                    addDesc("🧊 DORSAL VAGAL SHUTDOWN: Low-arousal freeze/dissociation state initiated.", "#3b82f6");
+                }
+                efficiency *= 0.15;
+            }
+
+            targetState.focus = baseFocus; targetState.chaos = baseChaos; targetState.sensory = baseSensory; targetState.overloadType = overloadType;
+            targetState.somatic = {
+                eff: Math.min(100, Math.max(0, efficiency)), mask: Math.min(100, Math.max(0, maskingEffort)),
+                breath: Math.min(100, Math.max(0, breathStrain)), vertigo: Math.min(100, Math.max(0, vertigoIndex)),
+                drag: Math.min(100, Math.max(0, dragIndex)), visceral: Math.min(100, Math.max(0, visceralIndex))
+            };
+            targetState.regions = reg;
+            
+            currentState.colors = selected.map(n => n.color);
+            if (currentState.colors.length === 0) currentState.colors = ["#94a3b8"];
+            particles.forEach(p => { p.targetColor = currentState.colors[Math.floor(Math.random() * currentState.colors.length)]; });
+
+            const connDist = (keys.includes('asd') || keys.includes('hsp') || keys.includes('gifted') || keys.includes('synesthesia') || keys.includes('hyperlexia')) ? 80 : 0;
+            currentState.connectionDistSq = connDist * connDist;
+
+            const traitNames = selected.map(n => n.name).join(' + ');
+            document.getElementById('desc-traits').innerHTML = `<strong>Active Profiles:</strong> ${traitNames || 'None'}`;
+            document.getElementById('desc-env').innerHTML = envDescHtml.join('');
+            document.getElementById('visual-badges').innerHTML = selected.map(n => `<span class="badge" style="border-color: ${n.color}; color: ${n.color}">${n.name}</span>`).join('') + `<span class="badge" style="border-color: #94a3b8">${pers.toUpperCase()}</span>`;
+
+            let spectrumHtml = selected.map(s => `<div style="margin-bottom:10px;"><strong>${s.name}:</strong> ${s.desc}</div>`).join('');
+            document.getElementById('desc-spectrum').innerHTML = spectrumHtml;
+            
+            const warning = document.getElementById('shutdown-warning');
+            const mainContent = document.getElementById('main-content-area');
+            mainContent.classList.remove('meltdown-pulse');
+            canvas.classList.remove('meltdown-active', 'shutdown-active', 'burnout-active');
+            
+            if (overloadType === 'burnout') {
+                canvas.classList.add('burnout-active');
+                warning.style.display = 'block'; warning.style.color = 'var(--somatic-debt)';
+                warning.textContent = 'SYSTEM FAILURE - ZERO SPOONS / BURNOUT';
+            } else if (overloadType === 'meltdown') {
+                canvas.classList.add('meltdown-active'); mainContent.classList.add('meltdown-pulse');
+                warning.style.display = 'block'; warning.style.color = '#ef4444';
+                warning.textContent = 'SYSTEM OVERLOAD - SYMPATHETIC MELTDOWN STATE';
+            } else if (overloadType === 'shutdown') {
+                canvas.classList.add('shutdown-active');
+                warning.style.display = 'block'; warning.style.color = '#3b82f6';
+                warning.textContent = 'SYSTEM OVERLOAD - DORSAL VAGAL SHUTDOWN STATE';
+            } else {
+                warning.style.display = 'none';
+            }
+
+            document.getElementById('desc-audio').innerHTML = `Tempo: ${Math.floor(90 + targetState.chaos * 14)} BPM<br>Harmony: ${targetState.focus > 5.5 && targetState.regions.a < 0.6 ? 'Consonant' : 'Dissonant/Tense'}<br>Waveform: ${targetState.sensory > 7 ? 'Sawtooth' : targetState.sensory > 4 ? 'Triangle' : 'Sine'}`;
+
+            if (!skipURLSave) saveStateToURL();
+        }
+
+        // --- Perturbation triggers ---
+        function triggerPerturbation(type) {
+            const btnId = type === 'distraction' ? 'btn-distraction' : 'btn-unexpected-change';
+            const btn = document.getElementById(btnId);
+
+            if (activePerturbation === type) {
+                if (perturbationTimer) clearTimeout(perturbationTimer);
+                activePerturbation = null;
+                btn.style.background = 'rgba(0,0,0,0.4)';
+                btn.style.borderColor = 'rgba(255,255,255,0.1)';
+                btn.style.color = 'var(--text-muted)';
+                recalculateTargetState();
+                return;
+            }
+            
+            if (activePerturbation && activePerturbation !== type) {
+                const prevBtnId = activePerturbation === 'distraction' ? 'btn-distraction' : 'btn-unexpected-change';
+                const prevBtn = document.getElementById(prevBtnId);
+                if (prevBtn) {
+                    prevBtn.style.background = 'rgba(0,0,0,0.4)';
+                    prevBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+                    prevBtn.style.color = 'var(--text-muted)';
+                }
+            }
+
+            activePerturbation = type;
+            recalculateTargetState();
+            
+            btn.style.background = 'rgba(251, 191, 36, 0.3)';
+            btn.style.borderColor = '#fbbf24';
+            btn.style.color = '#fff';
+
+            if (perturbationTimer) clearTimeout(perturbationTimer);
+            
+            if (type === 'unexpected_change') {
+                const keys = selects.map(s => s.value).filter(k => k !== 'none');
+                if (keys.includes('asd') || keys.includes('hsp') || keys.includes('ocd')) {
+                    currentSpoons = Math.max(0, currentSpoons - 6);
+                } else if (keys.includes('adhd')) {
+                    currentSpoons = Math.max(0, currentSpoons - 3);
+                } else {
+                    currentSpoons = Math.max(0, currentSpoons - 1);
+                }
+            }
+
+            perturbationTimer = setTimeout(() => {
+                activePerturbation = null;
+                btn.style.background = 'rgba(0,0,0,0.4)';
+                btn.style.borderColor = 'rgba(255,255,255,0.1)';
+                btn.style.color = 'var(--text-muted)';
+                recalculateTargetState();
+            }, type === 'distraction' ? 4000 : 6000);
+        }
+
+        document.getElementById('btn-distraction').addEventListener('click', () => triggerPerturbation('distraction'));
+        document.getElementById('btn-unexpected-change').addEventListener('click', () => triggerPerturbation('unexpected_change'));
+
+
+        // Brown Noise Generator Web Audio
+        let continuousAudioCtx = null;
+        let brownNoiseNode = null;
+        
+        function toggleBrownNoiseAudio(active) {
+            if (active) {
+                try {
+                    if (!continuousAudioCtx) continuousAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (continuousAudioCtx.state === 'suspended') continuousAudioCtx.resume();
+                    
+                    let bufferSize = 2 * continuousAudioCtx.sampleRate,
+                    noiseBuffer = continuousAudioCtx.createBuffer(1, bufferSize, continuousAudioCtx.sampleRate),
+                    output = noiseBuffer.getChannelData(0);
+                    let lastOut = 0;
+                    for (let i = 0; i < bufferSize; i++) {
+                        let white = Math.random() * 2 - 1;
+                        output[i] = (lastOut + (0.02 * white)) / 1.02;
+                        lastOut = output[i];
+                        output[i] *= 3.5;
+                    }
+                    brownNoiseNode = continuousAudioCtx.createBufferSource();
+                    brownNoiseNode.buffer = noiseBuffer;
+                    brownNoiseNode.loop = true;
+                    
+                    let bFilter = continuousAudioCtx.createBiquadFilter();
+                    bFilter.type = 'lowpass'; bFilter.frequency.value = 400;
+                    let bGain = continuousAudioCtx.createGain(); bGain.gain.value = 0.6;
+                    
+                    brownNoiseNode.connect(bFilter).connect(bGain).connect(continuousAudioCtx.destination);
+                    brownNoiseNode.start(0);
+                } catch(e) { console.warn("Audio blocked by browser."); }
+            } else if (brownNoiseNode) {
+                brownNoiseNode.stop(); brownNoiseNode.disconnect(); brownNoiseNode = null;
+            }
+        }
+
+        const toggleInterventionUI = (btnId, key) => {
+            setIntervention(key, !interventions[key]);
+            recalculateTargetState();
+        };
+
+        document.getElementById('btn-headphones').addEventListener('click', () => toggleInterventionUI('btn-headphones', 'headphones'));
+        document.getElementById('btn-breathe').addEventListener('click', () => toggleInterventionUI('btn-breathe', 'breathe'));
+        document.getElementById('btn-dark').addEventListener('click', () => toggleInterventionUI('btn-dark', 'dark'));
+        document.getElementById('btn-brown-noise').addEventListener('click', () => toggleInterventionUI('btn-brown-noise', 'brown_noise'));
+        document.getElementById('btn-stimming').addEventListener('click', () => toggleInterventionUI('btn-stimming', 'stimming'));
+        document.getElementById('btn-deep-rest').addEventListener('click', () => toggleInterventionUI('btn-deep-rest', 'deep_rest'));
+        
+        document.getElementById('btn-reset-spoons').addEventListener('click', () => {
+            currentSpoons = 100;
+            isBurnout = false;
+            if (currentMaskingDebt >= 100) currentMaskingDebt = 99;
+            recalculateTargetState();
+            
+            const btn = document.getElementById('btn-reset-spoons');
+            btn.style.background = 'rgba(52, 211, 153, 0.4)'; btn.style.color = '#fff';
+            setTimeout(() => { btn.style.background = 'rgba(31, 41, 61, 0.6)'; btn.style.color = 'var(--text-muted)'; }, 300);
+        });
+
+        document.getElementById('btn-reset-debt').addEventListener('click', () => {
+            currentMaskingDebt = 0;
+            isBurnout = false;
+            if (currentSpoons <= 0) currentSpoons = 5;
+            recalculateTargetState();
+            
+            const btn = document.getElementById('btn-reset-debt');
+            btn.style.background = 'rgba(52, 211, 153, 0.4)'; btn.style.color = '#fff';
+            setTimeout(() => { btn.style.background = 'rgba(31, 41, 61, 0.6)'; btn.style.color = 'var(--text-muted)'; }, 300);
+        });
+
+        document.querySelectorAll('select, input[type="range"]').forEach(el => {
+            if(el.id !== 'presetSelector') el.addEventListener('change', () => recalculateTargetState());
+        });
+
+        // --- CANVAS ENGINE ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        let width, height;
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            width = rect.width; height = rect.height;
+            if(liveChart) { liveChart.width = liveChart.parentElement.clientWidth; liveChart.height = liveChart.parentElement.clientHeight; }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let pointer = { x: width/2, y: height/2 };
+        canvas.addEventListener('pointermove', (e) => {
+            e.preventDefault(); const rect = canvas.getBoundingClientRect();
+            pointer.x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left; 
+            pointer.y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+        });
+
+        function lerpColor(a, b, amount) { 
+            const ah = parseInt(a.replace(/#/g, ''), 16), ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff;
+            const bh = parseInt(b.replace(/#/g, ''), 16), br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff;
+            const rr = ar + amount * (br - ar), rg = ag + amount * (bg - ag), rb = ab + amount * (bb - ab);
+            return '#' + (((1 << 24) + (rr << 16) + (rg << 8) + rb) | 0).toString(16).slice(1);
+        }
+
+        class Particle {
+            constructor() { 
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.size = Math.random() * 3.5 + 1;
+                this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 2;
+                this.currentColor = "#ffffff"; this.targetColor = "#ffffff";
+            }
+            update(sysState) {
+                let dx = pointer.x - this.x; let dy = pointer.y - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                
+                if (sysState.overloadType === 'shutdown' || sysState.overloadType === 'burnout') {
+                    this.vx *= (sysState.overloadType === 'burnout' ? 0.6 : 0.75);
+                    this.vy = Math.min(this.vy + 0.05, (sysState.overloadType === 'burnout' ? 1.0 : 0.5));
+                } else if (sysState.overloadType === 'meltdown') {
+                    this.vx += (Math.random() - 0.5) * 4; this.vy += (Math.random() - 0.5) * 4;
+                    this.vx *= 0.94; this.vy *= 0.94;
+                } else {
+                    let focusPull = (sysState.focus / 10) * 0.75;
+                    let jitterX = (Math.random() - 0.5) * sysState.chaos * 0.85;
+                    let jitterY = (Math.random() - 0.5) * sysState.chaos * 0.85;
+                    let gravityDrag = (sysState.somatic.drag / 100) * 0.4;
+
+                    this.vx += (dx / dist * focusPull) + jitterX;
+                    this.vy += (dy / dist * focusPull) + jitterY + gravityDrag;
+                    this.vx *= 0.85; this.vy *= 0.85; 
+                }
+
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) {
+                    this.y = this.y > height ? height : 0;
+                    this.vy *= sysState.overloadType !== 'none' ? -0.3 : -1;
+                }
+                if (this.currentColor !== this.targetColor) this.currentColor = lerpColor(this.currentColor, this.targetColor, 0.05);
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.currentColor; ctx.fill();
+            }
+        }
+
+        let particles = Array.from({length: 150}, () => new Particle());
+        const regionEls = { f: document.getElementById('frontal'), t: document.getElementById('temporal'), p: document.getElementById('parietal'), o: document.getElementById('occipital'), a: document.getElementById('amygdala') };
+
+        let lastFrameTime = 0;
+
+        function animate(now) {
+            if (!lastFrameTime) lastFrameTime = now;
+            const deltaTime = Math.max(0.001, Math.min((now - lastFrameTime) / 1000, 0.1));
+            lastFrameTime = now;
+
+            const lerpSpeed = 0.05;
+            
+            if (interventions.deep_rest) {
+                currentSpoons = Math.min(100, currentSpoons + (15 * deltaTime));
+                currentMaskingDebt = Math.max(0, currentMaskingDebt - (2.5 * deltaTime)); 
+                if (currentMaskingDebt < 80 && currentSpoons > 20 && isBurnout) { 
+                    isBurnout = false; recalculateTargetState(true); 
+                }
+            } else if (!isBurnout) {
+                let spoonDrainRate = Math.max(0.2, (targetState.loadMetric / 15));
+                if(targetState.somatic.mask > 0) spoonDrainRate += (targetState.somatic.mask / 40);
+                
+                currentSpoons = Math.max(0, currentSpoons - (spoonDrainRate * deltaTime));
+                
+                if (currentSpoons <= 0) {
+                    if (!isBurnout) { isBurnout = true; recalculateTargetState(true); }
+                } else if (targetState.somatic.mask > 0) {
+                    const accumulationRate = interventions.stimming ? 0.4 : 1.2; 
+                    currentMaskingDebt += (targetState.somatic.mask / 100) * accumulationRate * deltaTime;
+                    if (currentMaskingDebt >= 100) { 
+                        currentMaskingDebt = 100; 
+                        if (!isBurnout) { isBurnout = true; recalculateTargetState(true); }
+                    }
+                }
+            } else if (isBurnout && !interventions.deep_rest) {
+                 if (targetState.somatic.mask > 0) {
+                    const accumulationRate = interventions.stimming ? 0.2 : 0.6;
+                    currentMaskingDebt = Math.min(100, currentMaskingDebt + (targetState.somatic.mask / 100) * accumulationRate * deltaTime);
+                }
+            }
+            
+            document.getElementById('bar-debt').style.width = `${currentMaskingDebt}%`;
+            document.getElementById('val-debt').textContent = `${Math.floor(currentMaskingDebt)}%`;
+            document.getElementById('bar-spoons').style.width = `${currentSpoons}%`;
+            document.getElementById('val-spoons').textContent = `${Math.floor(currentSpoons)}%`;
+            
+            if (currentSpoons < 25) { 
+                document.getElementById('bar-spoons').style.background = '#ef4444'; 
+                document.getElementById('bar-spoons').style.boxShadow = '0 0 8px #ef4444'; 
+            } else { 
+                document.getElementById('bar-spoons').style.background = 'var(--somatic-spoons)'; 
+                document.getElementById('bar-spoons').style.boxShadow = '0 0 8px var(--somatic-spoons)'; 
+            }
+
+            chartData.shift(); chartData.push(targetState.loadMetric);
+            chartCtx.clearRect(0,0, liveChart.width, liveChart.height);
+            chartCtx.beginPath();
+            let maxLoad = parseInt(document.getElementById('overloadThreshold').value, 10) * 1.5;
+            chartCtx.moveTo(0, liveChart.height - (chartData[0] / maxLoad) * liveChart.height);
+            for(let i=1; i<chartData.length; i++) {
+                chartCtx.lineTo((i/chartData.length) * liveChart.width, liveChart.height - (chartData[i] / maxLoad) * liveChart.height);
+            }
+            chartCtx.strokeStyle = 'rgba(56, 189, 248, 0.6)'; chartCtx.lineWidth = 2; chartCtx.stroke();
+            
+            let threshY = liveChart.height - (parseInt(document.getElementById('overloadThreshold').value, 10) / maxLoad) * liveChart.height;
+            chartCtx.beginPath(); chartCtx.moveTo(0, threshY); chartCtx.lineTo(liveChart.width, threshY);
+            chartCtx.strokeStyle = 'rgba(239, 68, 68, 0.4)'; chartCtx.setLineDash([4, 4]); chartCtx.stroke(); chartCtx.setLineDash([]);
+
+            currentState.focus += (targetState.focus - currentState.focus) * lerpSpeed;
+            currentState.chaos += (targetState.chaos - currentState.chaos) * lerpSpeed;
+            currentState.overloadType = targetState.overloadType;
+            
+            Object.keys(currentState.somatic).forEach(k => { currentState.somatic[k] += (targetState.somatic[k] - currentState.somatic[k]) * lerpSpeed; });
+            Object.keys(currentState.regions).forEach(k => { currentState.regions[k] += (targetState.regions[k] - currentState.regions[k]) * lerpSpeed; });
+
+            let trailOpacity = (currentState.chaos > 6.5 || document.getElementById('monologue').value === 'racing') ? 0.08 : 0.3;
+            ctx.fillStyle = `rgba(3, 7, 18, ${trailOpacity})`; 
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.beginPath(); ctx.arc(pointer.x, pointer.y, 16, 0, Math.PI * 2);
+            ctx.strokeStyle = currentState.overloadType === 'meltdown' ? 'rgba(239, 68, 68, 0.8)' : (currentState.overloadType === 'shutdown' || currentState.overloadType === 'burnout' ? 'rgba(59, 130, 246, 0.8)' : 'rgba(255,255,255,0.25)');
+            ctx.lineWidth = 1.5; ctx.stroke();
+
+            particles.forEach(p => { p.update(currentState); p.draw(); });
+
+            if (currentState.connectionDistSq > 0 && currentState.overloadType === 'none') {
+                const connSq = currentState.connectionDistSq;
+                for (let i = 0; i < particles.length; i+=2) { 
+                    for (let j = i+1; j < particles.length; j+=3) {
+                        let dx = particles[i].x - particles[j].x; let dy = particles[i].y - particles[j].y;
+                        let distSq = dx*dx + dy*dy;
+                        if (distSq < connSq) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.25 * (1 - distSq/connSq)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            Object.entries(currentState.regions).forEach(([key, val]) => {
+                let el = regionEls[key];
+                el.style.opacity = val;
+                el.style.boxShadow = val > 0.5 ? `0 0 ${val * 40}px ${regionColors[key]}` : 'none';
+            });
+
+            const updateMeter = (id, val) => {
+                document.getElementById(`bar-${id}`).style.width = `${val}%`;
+                document.getElementById(`val-${id}`).textContent = `${Math.round(val)}%`;
+            };
+            updateMeter('eff', currentState.somatic.eff);
+            updateMeter('mask', currentState.somatic.mask);
+            updateMeter('breath', currentState.somatic.breath);
+            updateMeter('drag', currentState.somatic.drag);
+
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        // --- AUDIO ENGINE ---
+        let audioCtx = null;
+        let isPlaying = false;
+
+        async function generateAudioSignature() {
+            if (isPlaying) return;
+            
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
+            } catch (e) {
+                document.getElementById('audioStatus').textContent = "Audio blocked by browser."; return;
+            }
+            
+            isPlaying = true;
+            const btn = document.getElementById('playBtn');
+            const status = document.getElementById('audioStatus');
+            btn.disabled = true; status.textContent = "Playing procedural state audio...";
+
+            const { focus, chaos, sensory, somatic, regions, overloadType } = targetState;
+            const env = document.getElementById('environment').value;
+            const stepDuration = 60 / (90 + (chaos * 14));
+            
+            const harmoniousNotes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+            const dissonantNotes = [261.63, 277.18, 311.13, 369.99, 415.30, 466.16];
+
+            let masterFilter = audioCtx.createBiquadFilter();
+            masterFilter.type = (overloadType === 'shutdown' || overloadType === 'burnout') ? 'lowpass' : (overloadType === 'meltdown' ? 'highpass' : 'allpass');
+            masterFilter.frequency.value = overloadType === 'burnout' ? 180 : (overloadType === 'shutdown' ? 280 : (overloadType === 'meltdown' ? 1200 : 20000));
+            masterFilter.connect(audioCtx.destination);
+
+            const waveType = sensory > 7 ? 'sawtooth' : sensory > 4 ? 'triangle' : 'sine';
+            const totalSteps = 12; 
+            let startTime = audioCtx.currentTime + 0.1;
+
+            if (overloadType !== 'none' || somatic.breath > 30 || regions.a > 0.4) {
+                const drone = audioCtx.createOscillator();
+                const droneGain = audioCtx.createGain();
+                drone.type = overloadType === 'meltdown' ? 'sawtooth' : 'sine';
+                drone.frequency.value = (overloadType === 'shutdown' || overloadType === 'burnout') ? 40 : 55 + (somatic.breath * 0.3);
+                
+                droneGain.gain.setValueAtTime(0.01, startTime);
+                droneGain.gain.linearRampToValueAtTime(0.22, startTime + 1);
+                droneGain.gain.linearRampToValueAtTime(0.01, startTime + (totalSteps * stepDuration));
+                
+                drone.connect(droneGain).connect(masterFilter);
+                drone.start(startTime);
+                drone.stop(startTime + (totalSteps * stepDuration));
+
+                drone.onended = () => { drone.disconnect(); droneGain.disconnect(); };
+            }
+
+            let isSpatial = (env === 'social' || env === 'office' || env === 'networking_event');
+
+            for (let i = 0; i < totalSteps; i++) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const panner = audioCtx.createStereoPanner();
+
+                if (isSpatial) {
+                    panner.pan.value = Math.sin((i / totalSteps) * Math.PI * 4) * (chaos > 5 ? 1 : 0.5); 
+                } else {
+                    panner.pan.value = chaos > 4 ? (Math.random() * 2) - 1 : 0;
+                }
+
+                let notesArray = (focus > 5.5 && regions.a < 0.6 && overloadType === 'none') ? harmoniousNotes : dissonantNotes;
+                let freq = notesArray[chaos > 6 ? Math.floor(Math.random() * notesArray.length) : i % notesArray.length];
+                if (overloadType === 'shutdown' || overloadType === 'burnout') freq *= 0.5;
+
+                osc.type = waveType;
+                osc.frequency.setValueAtTime(freq, startTime + (i * stepDuration));
+
+                let noteTime = startTime + (i * stepDuration);
+                gain.gain.setValueAtTime(0, noteTime);
+                gain.gain.linearRampToValueAtTime(0.18, noteTime + 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.001, noteTime + stepDuration); 
+                
+                osc.connect(gain).connect(panner).connect(masterFilter);
+                osc.start(noteTime);
+                osc.stop(noteTime + stepDuration);
+
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); panner.disconnect(); };
+            }
+            setTimeout(() => {
+                isPlaying = false; btn.disabled = false; status.textContent = "";
+                masterFilter.disconnect();
+            }, (totalSteps * stepDuration * 1000) + 400);
+        }
+
+        document.getElementById('playBtn').addEventListener('click', generateAudioSignature);
+        
+        loadStateFromURL();
+        recalculateTargetState();
+    </script>
+</body>
+</html>
